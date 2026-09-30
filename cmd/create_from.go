@@ -17,4 +17,5 @@ var createFromCmd = &cobra.Command{
 
 func init() {
 	createCmd.AddCommand(createFromCmd)
+	createFromCmd.Flags().StringP("input-file", "i", "", "input file for boilerplate as a base")
 }

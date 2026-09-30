@@ -18,7 +18,7 @@ func CreateBoilerFile(cmd *cobra.Command, args []string) error {
 	editor, _:= cmd.Flags().GetString("editor")
 
 	// creates all the parent directories of the arguments.
-	utils.CreateBoilerDirs(args)
+	utils.CreateBoilerDirsByRelativePath(args)
 
 	editCommand := exec.Command(editor, utils.GetFullFilePathSlice(args)...)
 	editCommand.Dir = utils.GetBoilerDataDir()

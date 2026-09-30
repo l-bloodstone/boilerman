@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -21,7 +22,7 @@ func GetBoilerDataDir() string {
 	return  boilerDataDir
 }
 
-func CreateBoilerDirs(relativeFileName []string) {
+func CreateBoilerDirsByRelativePath(relativeFileName []string) {
 	for _, fileName := range relativeFileName {
 		fullFillPath := GetFullFilePath(fileName)
 		fmt.Println("File Created: " + fullFillPath)
@@ -46,4 +47,30 @@ func GetFullFilePathSlice(relativeFileName []string) []string {
 		s = append(s, GetFullFilePath(filename))
 	}
 	return s
+}
+
+func CopyFileFromString(sourceFullPath string, destinationFullPath string) {
+	
+	srcFile, err := os.Open(sourceFullPath)
+	if err != nil {
+		fmt.Println("Source file cannot be copied!")
+		panic(err)
+	}
+	
+	// creating all the parent directories
+	err = os.MkdirAll(filepath.Dir(destinationFullPath), 0777)
+	if err != nil {
+		panic(err)
+	}
+	
+	destFile, err := os.Create(destinationFullPath)
+	if err != nil {
+		fmt.Println("Couldn't create boilerplate file!")
+		panic(err)
+	}
+
+	_, err = io.Copy(destFile, srcFile)
+	if err != nil {
+		panic(err)
+	}
 }
