@@ -74,3 +74,15 @@ func CopyFileFromString(sourceFullPath string, destinationFullPath string) {
 		panic(err)
 	}
 }
+
+func RemoveBoilerplate(relativePaths []string) error {
+	for _, file := range relativePaths {
+		fileFullPath := GetFullFilePath(file)
+		err := os.Remove(fileFullPath)
+		if err != nil {
+			return err
+		}
+		fmt.Println("File Removed: " + fileFullPath)
+	}
+	return nil
+}
