@@ -22,14 +22,15 @@ func GetBoilerDataDir() string {
 	return  boilerDataDir
 }
 
-func CreateBoilerDirsByRelativePath(relativeFileName []string) {
+func CreateBoilerDirsByRelativePath(relativeFileName []string) error {
 	for _, fileName := range relativeFileName {
 		fullFillPath := GetFullFilePath(fileName)
-		fmt.Println("File Created: " + fullFillPath)
-		if err := os.MkdirAll(filepath.Dir(fullFillPath), 0666); err != nil {
-			panic(err)
+		if err := os.MkdirAll(filepath.Dir(fullFillPath), 0777); err != nil {
+			return err
 		}
+		fmt.Println("File Created: " + fullFillPath)
 	}
+	return nil
 }
 
 func CleanBoilerDirs() error {
@@ -86,3 +87,14 @@ func RemoveBoilerplate(relativePaths []string) error {
 	}
 	return nil
 }
+
+func RemoveBoilerplateGroup(relativePath string) error {
+		dirFullPath := path.Join(GetBoilerDataDir(), relativePath)
+		_, err := os.ReadDir(dirFullPath)
+		if err != nil {
+			fmt.Println("This group is not exists or Not a directory at all.")
+			return err
+		}
+		os.RemoveAll(dirFullPath)
+		return nil
+	}
