@@ -16,4 +16,5 @@ func init() {
 	rootCmd.AddCommand(genCmd)
 	genCmd.Flags().StringP("input", "i", "", "specify a template to generate")
 	genCmd.Flags().StringP("output", "o", "", "output file name")
+	genCmd.Flags().BoolP("force-ignore", "f", false, "Force ignore not given fields!")
 }
