@@ -18,16 +18,19 @@ func GenerateBoilerplate(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	isForced, err := cmd.Flags().GetBool("force-ignore")
 	templateFullPath := utils.GetFullFilePath(input)
 	dataMap := parser.ParseKeyValueToMap(args)
-	ignored, err := parser.ParseTemplate(templateFullPath, outfile, dataMap)
+	ignored, err := parser.ParseTemplate(templateFullPath, outfile, dataMap, isForced)
 	if err != nil {
 		return err
 	}
 	// print all the ignored keys with warning
-	cmd.Println("You have ignored this/these field(s).")
-	for k, _ := range ignored {
-		cmd.PrintErrln(k)
+	if len(ignored) > 0 {
+		cmd.Println("You have ignored this/these field(s).")
+		for k, _ := range ignored {
+			cmd.PrintErrln(k)
+		}
 	}
 	
 	return nil

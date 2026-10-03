@@ -25,7 +25,7 @@ func ParseFieldsFromFile(file string) (map[string]struct{}, error){
 	return m, nil
 }
 
-func ParseTemplate(srcFile string, destFile string, dataMap map[string]string) (map[string]struct{}, error) {
+func ParseTemplate(srcFile string, destFile string, dataMap map[string]string, forced bool) (map[string]struct{}, error) {
 	if destFile == "" {
 		return nil, errors.New("No output file specified.")
 	}
@@ -54,6 +54,10 @@ func ParseTemplate(srcFile string, destFile string, dataMap map[string]string) (
 		if !ok {
 			ignoredMap[k] = struct{}{}
 		}
+	}
+
+	if !forced && (len(ignoredMap) > 0) {
+		return ignoredMap, errors.New("You have ignored some fields in template, use -f or --force-ignore to force.")
 	}
 	
 	t, err := template.ParseFiles(srcFile)
