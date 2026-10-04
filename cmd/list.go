@@ -18,8 +18,16 @@ var listGroupCmd = &cobra.Command{
 	RunE: helpers.ListGroupsOfBoilerplates,
 }
 
+var listFieldsCmd = &cobra.Command{
+	Use: "field",
+	Short: "List all the available fields from a boilerplate",
+	RunE: helpers.ListBoilerplateFields,
+}
+
 func init() {
 	rootCmd.AddCommand(listCmd)
 	
 	listCmd.AddCommand(listGroupCmd)
+
+	listCmd.AddCommand(listFieldsCmd)
 }

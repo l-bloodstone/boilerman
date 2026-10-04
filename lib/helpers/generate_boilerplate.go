@@ -23,11 +23,15 @@ func GenerateBoilerplate(cmd *cobra.Command, args []string) error {
 	dataMap := parser.ParseKeyValueToMap(args)
 	ignored, err := parser.ParseTemplate(templateFullPath, outfile, dataMap, isForced)
 	if err != nil {
+		cmd.Println("\nAvailable fields are...")
+		for k, _ := range ignored {
+			cmd.PrintErrln("`" + k + "`")
+		}
 		return err
 	}
 	// print all the ignored keys with warning
 	if len(ignored) > 0 {
-		cmd.Println("You have ignored this/these field(s).")
+		cmd.Println("\nYou have ignored this/these field(s).")
 		for k, _ := range ignored {
 			cmd.PrintErrln(k)
 		}

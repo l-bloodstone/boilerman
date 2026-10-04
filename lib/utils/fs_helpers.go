@@ -54,6 +54,7 @@ func GetFullFilePathSlice(relativeFileName []string) []string {
 func CopyFileFromString(sourceFullPath string, destinationFullPath string) {
 
 	srcFile, err := os.Open(sourceFullPath)
+	defer srcFile.Close()
 	if err != nil {
 		fmt.Println("Source file cannot be copied!")
 		panic(err)
@@ -66,6 +67,7 @@ func CopyFileFromString(sourceFullPath string, destinationFullPath string) {
 	}
 
 	destFile, err := os.Create(destinationFullPath)
+	defer destFile.Close()
 	if err != nil {
 		fmt.Println("Couldn't create boilerplate file!")
 		panic(err)

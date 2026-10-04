@@ -22,6 +22,13 @@ func RemoveGroupFunc(cmd *cobra.Command, args []string) error {
 			}
 		case 'n':
 			return errors.New("Deletion Aborted!")
+		case 'Y':
+			err := utils.RemoveBoilerplateGroup(dir)
+			if err != nil {
+				return err
+			}
+		case 'N':
+			return errors.New("Deletion Aborted!")
 
 		default:
 			return errors.New("only y/n supported")

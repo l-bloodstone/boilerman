@@ -39,15 +39,6 @@ func ParseTemplate(srcFile string, destFile string, dataMap map[string]string, f
 	if err != nil {
 		return nil, err
 	}
-	// to set a intersected map of fields and provided substitute
-	for k, v := range dataMap {
-		_, ok := fieldsMap[k]
-		if ok {
-			intersectedMap[k] = v
-		} else {
-			return nil, errors.New("Your provided field `" + k + "` is not defined.")
-		}
-	}
 	// to generate a map of ignored field which will cause <no value> tag in boilerplate
 	for k, _ := range fieldsMap {
 		_, ok := dataMap[k]
@@ -56,6 +47,15 @@ func ParseTemplate(srcFile string, destFile string, dataMap map[string]string, f
 		}
 	}
 
+	// to set a intersected map of fields and provided substitute
+	for k, v := range dataMap {
+		_, ok := fieldsMap[k]
+		if ok {
+			intersectedMap[k] = v
+		} else {
+			return ignoredMap, errors.New("Your provided field `" + k + "` is not defined.")
+		}
+	}
 	if !forced && (len(ignoredMap) > 0) {
 		return ignoredMap, errors.New("You have ignored some fields in template, use -f or --force-ignore to force.")
 	}
@@ -65,6 +65,7 @@ func ParseTemplate(srcFile string, destFile string, dataMap map[string]string, f
 		return nil, err
 	}
 	createFile, err := os.Create(destFile)
+	defer createFile.Close()
 	if err != nil {
 		return nil, err
 	}
