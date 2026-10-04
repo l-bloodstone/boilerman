@@ -23,13 +23,23 @@ func CreateBoilerFile(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	editCommand := exec.Command(editor, utils.GetFullFilePathSlice(args)...)
-	editCommand.Dir = utils.GetBoilerDataDir()
-	editCommand.Stdout = os.Stdout
-	if err := editCommand.Run(); err != nil {
-		cmd.PrintErrln(err)
-		return err
+	if editor == "" {
+		editors := []string{"nvim", "kate"}
+		for _, editor := range editors {
+			editCommand := exec.Command(editor, utils.GetFullFilePathSlice(args)...)
+			editCommand.Dir = utils.GetBoilerDataDir()
+			editCommand.Stdout = os.Stdout
+			if err := editCommand.Run(); err != nil {
+				continue
+			}
+		}
+	} else {
+		editCommand := exec.Command(editor, utils.GetFullFilePathSlice(args)...)
+		editCommand.Dir = utils.GetBoilerDataDir()
+		editCommand.Stdout = os.Stdout
+		if err := editCommand.Run(); err != nil {
+			return err
+		}
 	}
-	editCommand.Wait()
 	return nil
 }

@@ -20,7 +20,7 @@ func init() {
 
 	editorEnv := os.Getenv("EDITOR")
 	if editorEnv == "" {
-		createCmd.Println("An editor was not specified. Either use `-e` or set `EDITOR` environment variable.")
+		createCmd.Println("An editor was not specified. Either use `-e` or set `EDITOR` environment variable, or edit the file manually.")
 	}
 	createCmd.PersistentFlags().StringP("editor", "e", editorEnv, "specify an editor")
 	createCmd.PersistentFlags().BoolP("no-editor", "n", false, "set it true if editor should not open")
