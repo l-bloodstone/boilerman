@@ -5,6 +5,7 @@ import (
 	"boilerman/lib/helpers"
 
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // createCmd represents the create command
@@ -17,7 +18,11 @@ var createCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(createCmd)
 
-	createCmd.PersistentFlags().StringP("editor", "e", "nvim", "specify an editor")
+	editorEnv := os.Getenv("EDITOR")
+	if editorEnv == "" {
+		createCmd.Println("An editor was not specified. Either use `-e` or set `EDITOR` environment variable.")
+	}
+	createCmd.PersistentFlags().StringP("editor", "e", editorEnv, "specify an editor")
 	createCmd.PersistentFlags().BoolP("no-editor", "n", false, "set it true if editor should not open")
 
 	// Here you will define your flags and configuration settings.
