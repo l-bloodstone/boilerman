@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 )
 
 
@@ -51,19 +52,19 @@ func GetFullFilePathSlice(relativeFileName []string) []string {
 }
 
 func CopyFileFromString(sourceFullPath string, destinationFullPath string) {
-	
+
 	srcFile, err := os.Open(sourceFullPath)
 	if err != nil {
 		fmt.Println("Source file cannot be copied!")
 		panic(err)
 	}
-	
+
 	// creating all the parent directories
 	err = os.MkdirAll(filepath.Dir(destinationFullPath), 0777)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	destFile, err := os.Create(destinationFullPath)
 	if err != nil {
 		fmt.Println("Couldn't create boilerplate file!")
@@ -89,12 +90,71 @@ func RemoveBoilerplate(relativePaths []string) error {
 }
 
 func RemoveBoilerplateGroup(relativePath string) error {
-		dirFullPath := path.Join(GetBoilerDataDir(), relativePath)
-		_, err := os.ReadDir(dirFullPath)
-		if err != nil {
-			fmt.Println("This group is not exists or Not a directory at all.")
-			return err
-		}
-		os.RemoveAll(dirFullPath)
-		return nil
+	dirFullPath := path.Join(GetBoilerDataDir(), relativePath)
+	_, err := os.ReadDir(dirFullPath)
+	if err != nil {
+		fmt.Println("This group is not exists or Not a directory at all.")
+		return err
 	}
+	os.RemoveAll(dirFullPath)
+	return nil
+
+}
+
+func ReadDirAndPrintRecur(prevPath string, newpath string) error {
+	n := path.Join(prevPath, newpath)
+	dirs, err := os.ReadDir(n)
+	if err != nil {
+		return err
+	}
+	for _, dir := range dirs {
+		if dir.IsDir() {
+			ReadDirAndPrintRecur(n, dir.Name())
+			continue
+		}
+		reg := regexp.MustCompile(`boilerman\/(.*)$`)
+		file := reg.FindStringSubmatch(path.Dir(path.Join(n, dir.Name())))[1]
+		fmt.Println(file)
+	}
+	return nil
+}
+
+func ReadSingleDirAndPrint(dirname string) error {
+	dir, err := os.Open(dirname)
+	defer dir.Close()
+	if err != nil {
+		return err
+	}
+	files, err := dir.Readdirnames(-1)
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		_, err := os.ReadDir(path.Join(dir.Name(), file))
+		if err == nil {
+			continue
+		}
+		reg := regexp.MustCompile(`boilerman\/(.*).boil$`)
+		f := reg.FindStringSubmatch(path.Join(dir.Name(), file))[1]
+		fmt.Println(f)
+	}
+	return nil
+}
+
+func ReadDirAndPrintFilesRecursive(prevPath string, newpath string) error {
+	n := path.Join(prevPath, newpath)
+	dirs, err := os.ReadDir(n)
+	if err != nil {
+		return err
+	}
+	for _, dir := range dirs {
+		if dir.IsDir() {
+			ReadDirAndPrintFilesRecursive(n, dir.Name())
+			continue
+		}
+		reg := regexp.MustCompile(`boilerman\/(.*).boil$`)
+		file := reg.FindStringSubmatch(path.Join(n, dir.Name()))[1]
+		fmt.Println(file)
+	}
+	return nil
+}
