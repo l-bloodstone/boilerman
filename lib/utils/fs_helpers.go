@@ -35,8 +35,43 @@ func CreateBoilerDirsByRelativePath(relativeFileName []string) error {
 	return nil
 }
 
-func CleanBoilerDirs() error {
-	// TODO: not implemented!
+func CleanBoilerDirs(current string, prev string) error {
+	baseDir := path.Join(current, prev)
+	dirEntry, err := os.ReadDir(baseDir)
+	if err != nil {
+		return err
+	}
+
+	for _, dir := range dirEntry {
+		if dir.IsDir() {
+			fmt.Println(dir.Name())
+			openDir, err := os.Open(path.Join(baseDir, dir.Name()))
+			if err != nil {
+				return err
+			}
+			defer openDir.Close()
+			
+			dirnames, err := openDir.Readdirnames(1)
+			if err != nil && err != io.EOF {
+				return err
+			}
+			if len(dirnames) == 0 {
+				os.Remove(path.Join(baseDir, dir.Name()))
+			} else {
+				
+				CleanBoilerDirs(baseDir, dir.Name())
+				
+				dirnames, err = openDir.Readdirnames(1)
+				if err != nil && err != io.EOF {
+					return err
+				}
+				if len(dirnames) == 0 {
+					os.Remove(path.Join(baseDir, dir.Name()))
+				}
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -95,7 +130,7 @@ func CreateFileFromStdin(stdin *os.File, dest string) error {
 	if n < 1 {
 		return errors.New("Zero bytes read from stdin")
 	}
-	
+
 	return nil
 }
 
