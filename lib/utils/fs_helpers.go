@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -51,32 +52,51 @@ func GetFullFilePathSlice(relativeFileName []string) []string {
 	return s
 }
 
-func CopyFileFromString(sourceFullPath string, destinationFullPath string) {
+func CopyFileFromString(sourceFullPath string, destinationFullPath string) error {
 
 	srcFile, err := os.Open(sourceFullPath)
 	defer srcFile.Close()
 	if err != nil {
-		fmt.Println("Source file cannot be copied!")
-		panic(err)
+		return err
 	}
 
 	// creating all the parent directories
 	err = os.MkdirAll(filepath.Dir(destinationFullPath), 0777)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	destFile, err := os.Create(destinationFullPath)
 	defer destFile.Close()
 	if err != nil {
-		fmt.Println("Couldn't create boilerplate file!")
-		panic(err)
+		return err
 	}
 
 	_, err = io.Copy(destFile, srcFile)
 	if err != nil {
-		panic(err)
+		return err
 	}
+	return nil
+}
+
+func CreateFileFromStdin(stdin *os.File, dest string) error {
+
+	destFullPath := GetFullFilePath(dest)
+	f, err := os.Create(destFullPath)
+	defer f.Close()
+	if err != nil {
+		return err
+	}
+
+	n, err := f.ReadFrom(stdin)
+	if err != nil {
+		return err
+	}
+	if n < 1 {
+		return errors.New("Zero bytes read from stdin")
+	}
+	
+	return nil
 }
 
 func RemoveBoilerplate(relativePaths []string) error {
@@ -109,14 +129,14 @@ func ReadDirAndPrintRecur(prevPath string, newpath string) error {
 	if err != nil {
 		return err
 	}
+	reg := regexp.MustCompile(`.*/boilerman/(.*)`)
 	for _, dir := range dirs {
 		if dir.IsDir() {
+			dirFullPath := path.Join(n, dir.Name())
+			group := reg.FindStringSubmatch(dirFullPath)[1]
+			fmt.Println(group)
 			ReadDirAndPrintRecur(n, dir.Name())
-			continue
 		}
-		reg := regexp.MustCompile(`boilerman\/(.*)$`)
-		file := reg.FindStringSubmatch(path.Dir(path.Join(n, dir.Name())))[1]
-		fmt.Println(file)
 	}
 	return nil
 }

@@ -3,6 +3,7 @@ package helpers
 import (
 	"boilerman/lib/parser"
 	"boilerman/lib/utils"
+	"errors"
 	"path"
 
 	"github.com/spf13/cobra"
@@ -18,6 +19,9 @@ func ListBoilerplates(cmd *cobra.Command, args []string) error {
 }
 
 func ListBoilerplateFields(cmd *cobra.Command, args []string) error {
+	if len(args) < 1 {
+		return errors.New("Needs at least 1 argument")
+	}
 	for _, boilerplate := range args {
 		fields, err := parser.ParseFieldsFromFile(path.Join(utils.GetBoilerDataDir(), boilerplate) + ".boil")
 		if err != nil {
@@ -34,7 +38,7 @@ func ListBoilerplateFields(cmd *cobra.Command, args []string) error {
 func ListGroupsOfBoilerplates(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		for _, group := range args {
-			err := utils.ReadSingleDirAndPrint(path.Join(utils.GetBoilerDataDir() + "/" + group))
+			err := utils.ReadSingleDirAndPrint(path.Join(utils.GetBoilerDataDir(), group))
 			if err != nil {
 				return err
 			}
